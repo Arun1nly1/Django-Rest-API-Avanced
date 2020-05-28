@@ -4,9 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import StatusSerializer
 from .models import Status
-from rest_framework import generics,mixins
+from rest_framework import generics, mixins, permissions
 from .forms import StatusForm 
 import json
+from rest_framework.authentication import SessionAuthentication
+
+
+
 # Create your views here.
 # class StatusListSearchAPIView(APIView):
 #     permission_classes = []
@@ -145,21 +149,18 @@ class StatusDetailAPIView(mixins.UpdateModelMixin,
 
 class StatusAPIView(
                     mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
                     generics.ListAPIView):
-    permission_classes = []
-    authentication_classes = []
-    serializer_class = StatusSerializer
+    permission_classes      = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes  = [SessionAuthentication] #Oauth, JWT
+    serializer_class        = StatusSerializer
     passed_id = None 
 
     def get_queryset(self):
         request = self.request
-        qs = Status.objects.all()
-        query = request.GET.get('q')
+        qs      = Status.objects.all()
+        query   = request.GET.get('q')
         if query is not None:
-            qs = qs.filter(content__icontains=query)
+            qs  = qs.filter(content__icontains=query)
         return qs
 
     # def get_object(self):
@@ -178,24 +179,29 @@ class StatusAPIView(
     #         return instance.delete()
     #     return None
 
-
-    def get(self,request, *args, **kwargs):
-        url_passed_id = request.GET.get('id',None)
-        json_data     = {}
-        body_         = request.body
-        if is_json(body_): 
-            json_data = json.loads(request.body)
-        new_passed_id = json_data.get('id',None)
-        print(request.body)
-        passed_id = url_passed_id or new_passed_id or None
-        self.passed_id = passed_id
-        if passed_id is not None:
-            return self.retrieve(request, *args, **kwargs)
-        return super().get(request, *args, **kwargs)
         
 
     def post(self,request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        return self.create(request, *args, **kwargs) 
+
+    
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
+
+
+    # def get(self,request, *args, **kwargs):
+    #     url_passed_id = request.GET.get('id',None)
+    #     json_data     = {}
+    #     body_         = request.body
+    #     if is_json(body_): 
+    #         json_data = json.loads(request.body)
+    #     new_passed_id = json_data.get('id',None)
+    #     print(request.body)
+    #     passed_id = url_passed_id or new_passed_id or None
+    #     self.passed_id = passed_id
+    #     if passed_id is not None:
+    #         return self.retrieve(request, *args, **kwargs)
+    #     return super().get(request, *args, **kwargs)
 
     # def put(self,request, *args, **kwargs):
     #     url_passed_id = request.GET.get('id',None)
