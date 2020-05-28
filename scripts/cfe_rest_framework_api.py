@@ -24,7 +24,10 @@ def do_img(method ='get',data = {}, is_json=True, img_path =None):
     print (r.status_code)
     return r
 
-do_img(method ='post', data = {'user':100,"content":""}, is_json=False)
+# do_img(method ='post', data = {'user':1,"content":""}, is_json=False,img_path=image_path)
+
+
+do_img(method ='put', data = {'id':7,'user':1,"content":"fuck yeah"}, is_json=False,img_path=image_path)
 
 def do(method ='get',data = {}, is_json=True):
     headers = {}
@@ -35,4 +38,6 @@ def do(method ='get',data = {}, is_json=True):
     print (r.text)
     print (r.status_code)
     return r
-do(method = 'delete' , data={'id':10})
+
+
+# do(method = 'delete' , data={'id':10})
