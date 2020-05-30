@@ -23,6 +23,8 @@ class AnonPermissionOnly(permissions.BasePermission):
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
+    message = "You must be the owner of this content to change it."
+
     """
     Object-level permission to only allow owners of an object to edit it.
     Assumes the model instance has an `owner` attribute.

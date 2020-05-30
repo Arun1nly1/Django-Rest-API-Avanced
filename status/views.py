@@ -8,7 +8,7 @@ from rest_framework import generics, mixins, permissions
 from .forms import StatusForm 
 import json
 from rest_framework.authentication import SessionAuthentication
-
+from accounts.api.permissions import IsOwnerOrReadOnly
 
 
 # Create your views here.
@@ -129,7 +129,7 @@ class StatusDetailAPIView(mixins.UpdateModelMixin,
                             mixins.DestroyModelMixin,
                             generics.RetrieveAPIView):
 
-    permission_classes      = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes      = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     authentication_classes     = []
     serializer_class           = StatusSerializer
     queryset                   = Status.objects.all()
